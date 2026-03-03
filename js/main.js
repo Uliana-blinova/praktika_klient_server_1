@@ -5,6 +5,10 @@ let product = "Socks";
             premium: {
                 type: Boolean,
                 required: true
+            },
+            cart: {
+                type: Array,
+                required: true
             }
         },
         template: `
@@ -34,15 +38,13 @@ let product = "Socks";
             <ul>
                 <li v-for="size in sizes">{{size}}</li>
             </ul>
-            <div class="cart">
-                <p>Cart {{ cart }}</p>
-            </div>
             <button v-on:click="addToCart"
             :disabled="!inStock"
             :class="{ disabledButton: !inStock}">Add to cart</button>
             <div class="cart-redu">
         </div>
         <button v-on:click="reduToCart">Reduce to cart</button>
+         <button v-on:click="removeFromCart">Remove from cart</button>
             <p v-if="inStock">In stock</p>
             <p v-else :class="{ outOfStock: !inStock }">Out of Stock</p>
         </div>
@@ -79,8 +81,11 @@ let product = "Socks";
         },
      methods: {
             addToCart() {
-                this.cart += 1
+                this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
             },
+             removeFromCart() {
+                 this.$emit('remove-from-cart', this.variants[this.selectedVariant].variantId);
+             },
             updateProduct(index) {
                 this.selectedVariant = index;
                 console.log(index);
@@ -135,6 +140,17 @@ let app = new Vue ({
     el: '#app',
     data: {
         premium: true,
-        cart: 0,
+        cart: [],
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        removeFromCart(id) {
+            const index = this.cart.indexOf(id);
+            if (index > -1) {
+                this.cart.splice(index, 1);
+            }
+        }
     }
 })
